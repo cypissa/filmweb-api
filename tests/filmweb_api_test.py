@@ -4,7 +4,7 @@
 import pytest
 import requests
 from src.filmweb_api import FilmwebApi
-from src.exceptions import LoginFailedException
+from src.exceptions import LoginFailedException, WrongArgumentException
 
 API_HOST = 'https://ssl.filmweb.pl/api'
 
@@ -44,4 +44,16 @@ def test_login_failed(requests_mock):
     sut = FilmwebApi('test_username', 'test_password')
 
     with pytest.raises(LoginFailedException):
+        sut.login()
+
+
+@pytest.mark.parametrize("username, password", [
+    (None, None),
+    ('some_username', None),
+    (None, 'some_password'),
+])
+def test_login_no_credentials(username, password):
+    sut = FilmwebApi(username, password)
+
+    with pytest.raises(WrongArgumentException):
         sut.login()
