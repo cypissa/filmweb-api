@@ -1,0 +1,9 @@
+.idea
+venv
+filmweb_api.egg-info
+dist
+build
+__pycache__
+.cache
+.pytest_cache
+*.pyc
