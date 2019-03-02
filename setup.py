@@ -9,6 +9,5 @@ setup(
    author='Cyprian Nosek',
    author_email='cypiszzz@gmail.com',
    packages=[NAME],
-   package_dir={NAME:'./src'},
    install_requires=['requests']
 )
