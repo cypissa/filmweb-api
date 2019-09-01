@@ -2,12 +2,12 @@
 """ Class for using filmweb's API """
 
 import re
-import ast
 import hashlib
 import urllib
-from requests import session
-from .config import Config
-from .exceptions import LoginFailedException, NoActiveUserSessionException, WrongArgumentException
+import json
+from requests import session, Session
+from filmweb_api.config import Config
+from filmweb_api.exceptions import LoginFailedException, NoActiveUserSessionException, WrongArgumentException
 
 
 class FilmwebApi:
@@ -33,18 +33,18 @@ class FilmwebApi:
     filmweb_api.get_film_info_full(film_id)  # get full info of film_id
     """
 
-    _config = None
-    _session = None
-    _request_headers = None
-
-    _app_user_id = None
-
-    def __init__(self, username, password, session_service=None, settings=None):
+    def __init__(self, username: str, password: str, session_service: Session = None, settings: dict = None):
         """ Initialize instance
 
         config - Config object containing necessary consts
         session_service - session service (eg. provided by requests.session() factory)
         """
+
+        self._config = None
+        self._session = None
+        self._request_headers = None
+
+        self._app_user_id = None
 
         if settings is None:
             settings = {}
@@ -66,7 +66,7 @@ class FilmwebApi:
         else:
             self._session = session_service
 
-    def login(self, username=None, password=None):
+    def login(self, username: str = None, password: str = None):
         """ Login
 
         username - if present override username from the config
@@ -104,14 +104,14 @@ class FilmwebApi:
         self._app_user_id = None
         self._session.cookies.clear()
 
-    def is_logged_in(self):
+    def is_logged_in(self) -> bool:
         """ Check whether there is a user logged in """
 
         if self._app_user_id is not None:
             return True
         return False
 
-    def get_user_film_votes(self, user_id=None):
+    def get_user_film_votes(self, user_id: int = None) -> list:
         """ Get all user's votes
 
         user_id - if present override currently logged user_id
@@ -133,7 +133,7 @@ class FilmwebApi:
 
         return self._fire_method('getUserFilmVotes [' + str(votes_user_id) + ', 1]')
 
-    def get_user_films_want_to_see(self, user_id=None):
+    def get_user_films_want_to_see(self, user_id: int = None) -> list:
         """ Get user's films they want to see
 
         user_id - if present override currently logged user_id
@@ -155,7 +155,7 @@ class FilmwebApi:
 
         return self._fire_method('getUserFilmsWantToSee [' + str(votes_user_id) + ', 1]')
 
-    def get_film_info_full(self, film_id):
+    def get_film_info_full(self, film_id: int) -> list:
         """ Get full info of a film
 
         film_id - id of the film
@@ -165,30 +165,30 @@ class FilmwebApi:
                 title, original_title, rate, votes_count, genres, year, duration, comments_count,
                 forum_url, has_review, has_description, image_path, video, premiere_world,
                 premiere_country, film_type, seasons_count, episodes_count, countries_string,
-                synopsis, recommends, premiere_world_public, premiere_country_public
+                synopsis
             ]
         """
         return self._fire_method('getFilmInfoFull [' + str(film_id) + ']')
 
-    def get_film_description(self, film_id):
+    def get_film_description(self, film_id: int):
         raise NotImplementedError('Method is not yet implemented')
 
-    def get_film_images(self, film_id):
+    def get_film_images(self, film_id: int):
         raise NotImplementedError('Method is not yet implemented')
 
-    def get_film_persons(self, film_id):
+    def get_film_persons(self, film_id: int):
         raise NotImplementedError('Method is not yet implemented')
 
-    def get_film_review(self, film_id):
+    def get_film_review(self, film_id: int):
         raise NotImplementedError('Method is not yet implemented')
 
-    def get_film_videos(self, film_id):
+    def get_film_videos(self, film_id: int):
         raise NotImplementedError('Method is not yet implemented')
 
-    def get_films_info_short(self, film_ids):
+    def get_films_info_short(self, film_ids: list):
         raise NotImplementedError('Method is not yet implemented')
 
-    def _prepare(self, method):
+    def _prepare(self, method) -> (str, str):
         """ Prepare data for request """
 
         md5 = hashlib.md5()
@@ -206,7 +206,7 @@ class FilmwebApi:
 
         return target_url, params
 
-    def _fire_method(self, method):
+    def _fire_method(self, method: str) -> str or list:
         """ Make a request """
 
         target_url, _ = self._prepare(method + '\n')
@@ -216,19 +216,19 @@ class FilmwebApi:
         return self._parse_content(response.content)
 
     @staticmethod
-    def _parse_content(content):
+    def _parse_content(content) -> list or str:
         """ Parse raw response's content """
 
         if isinstance(content, bytes):
             content = str(content.decode('utf-8'))
-        content = content.replace("\\n", "\n")
+        content = content.replace("\\n", "")
 
-        content = content.splitlines()[1]
+        content = content.split("\n", 1)[1]
 
         content = re.sub(r"^(\[.*\])[^\]]*$", r"\1", content)
-        content = content.replace("null", "None")
+        content = content.replace("null", "\"\"")
 
         if not re.match(r"^\[.*\]$", content):
             return str(content)
 
-        return ast.literal_eval(content)
+        return json.loads(content)
