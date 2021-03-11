@@ -148,6 +148,27 @@ class FilmwebApi:
         """
         return self._fire_method('getFilmInfoFull [' + str(film_id) + ']')
 
+    def get_film_description(self, film_id):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_film_images(self, film_id):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_film_persons(self, film_id):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_film_review(self, film_id):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_film_videos(self, film_id):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_films_info_short(self, film_ids):
+        raise NotImplementedError('Method is not yet implemented')
+
+    def get_user_films_want_to_see(self, user_id):
+        raise NotImplementedError('Method is not yet implemented')
+
     def _prepare(self, method):
         """ Prepare data for request """
 
