@@ -3,7 +3,7 @@
 
 import pytest
 import requests
-from filmweb_api.filmweb_api import FilmwebApi
+from filmweb_api import FilmwebApi
 from filmweb_api.exceptions import LoginFailedException, WrongArgumentException
 
 API_HOST = 'https://ssl.filmweb.pl/api'
