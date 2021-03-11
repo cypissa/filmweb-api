@@ -133,6 +133,28 @@ class FilmwebApi:
 
         return self._fire_method('getUserFilmVotes [' + str(votes_user_id) + ', 1]')
 
+    def get_user_films_want_to_see(self, user_id=None):
+        """ Get user's films they want to see
+
+        user_id - if present override currently logged user_id
+
+        Returns:
+            [
+                [film_id, timestamp, level, film_type]
+                # ...
+            ]
+        """
+
+        if self.is_logged_in():
+            votes_user_id = self._app_user_id
+        else:
+            raise NoActiveUserSessionException('There is no active session. Please use \'login\' method first.')
+
+        if user_id is not None:
+            votes_user_id = user_id
+
+        return self._fire_method('getUserFilmsWantToSee [' + str(votes_user_id) + ', 1]')
+
     def get_film_info_full(self, film_id):
         """ Get full info of a film
 
@@ -164,9 +186,6 @@ class FilmwebApi:
         raise NotImplementedError('Method is not yet implemented')
 
     def get_films_info_short(self, film_ids):
-        raise NotImplementedError('Method is not yet implemented')
-
-    def get_user_films_want_to_see(self, user_id):
         raise NotImplementedError('Method is not yet implemented')
 
     def _prepare(self, method):
