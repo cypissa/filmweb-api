@@ -89,9 +89,13 @@ films = filmweb_api.get_film_info_full(user_id)
 
 # Development
 
-To install the package in development mode:
-
+Get poetry:
 ```
-pip install -r requirements.txt
-pip install -e .
+curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
+python ./get-poetry.sh --preview -y
+```
+
+Install deps:
+```
+poetry install --dev
 ```
